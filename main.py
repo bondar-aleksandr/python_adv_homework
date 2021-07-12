@@ -7,9 +7,17 @@ except ImportError:
 
 import model
 import functools
+import sys
+import argparse
+if len(sys.argv) > 1:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--user", required=False, type=str, help='username to operate upon')
+    parser.add_argument("--phone", required=False, type=str, help='phone to operate upon')
+    parser.add_argument("--operation", required=True, type=str, choices=['create', 'read', 'update', 'delete', 'show'])
+    args = parser.parse_args()
 
 
-def main(records):
+def main(records, args:argparse.Namespace = None):
 
     operation_actions = {
         '1': functools.partial(model.create_record, records=records),
@@ -19,6 +27,13 @@ def main(records):
         '5': functools.partial(model.show_all, records=records),
         '6': exit,
     }
+
+    if args:
+        if args.create:
+            user = args.user
+            phone = args.phone
+            model.create_record(records=records, name=user, phone=phone)
+
 
     while True:
         operation = input('''

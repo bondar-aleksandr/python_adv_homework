@@ -20,9 +20,11 @@ def check_name(name: str) -> bool:
     return name.isalpha()
 
 
-def create_record(records: dict):
-    name = input('enter name: ')
-    phone = input('enter phone: ')
+def create_record(records: dict, name:str = None, phone:str = None):
+    if not name:
+        name = input('enter name: ')
+    if not phone:
+        phone = input('enter phone: ')
     if not check_name(name) or not check_phone(phone):
         raise ValueError
     records[name] = phone
