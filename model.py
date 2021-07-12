@@ -2,8 +2,9 @@ import config
 
 
 def check_existence(f):
-    def wrapper(*args, records, **kwargs):
-        name = input('Enter name:')
+    def wrapper(*args, records, name=None, **kwargs):
+        if not name:
+            name = input('Enter name:')
         if records.get(name) is not None:
             result = f(*args, records, name, **kwargs)
             return result
@@ -28,6 +29,7 @@ def create_record(records: dict, name:str = None, phone:str = None):
     if not check_name(name) or not check_phone(phone):
         raise ValueError
     records[name] = phone
+    print('Success!')
 
 
 @check_existence
@@ -39,8 +41,9 @@ def read_record(records, name):
 
 
 @check_existence
-def update_record(records, name):
-    phone = input('enter phone: ')
+def update_record(records, name, phone=None):
+    if not phone:
+        phone = input('enter phone: ')
     if not check_phone(phone):
         raise ValueError
     records[name] = phone
