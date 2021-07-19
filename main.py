@@ -17,10 +17,10 @@ if len(sys.argv) > 1:
     parser.add_argument("--name", required=False, type=str, help='name to operate upon')
     parser.add_argument("--phone", required=False, type=str, help='phone to operate upon')
     parser.add_argument("--operation", required=True, type=str, choices=['create', 'read', 'update', 'delete', 'show'])
-    args = parser.parse_args()
+    args = parser.parse_args(sys.argv[1:])
 
 
-def main(records, args:argparse.Namespace = None):
+def main(records):
 
     def operate(actions: dict, code: str):
         try:
@@ -96,4 +96,4 @@ if __name__ == '__main__':
     except serialize.FileError:
         print(f'Wrong file format for file {config.filename}!')
     else:
-        main(records=records, args=args)
+        main(records=records)
