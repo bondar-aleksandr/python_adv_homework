@@ -9,6 +9,7 @@ import model
 import functools
 import sys
 import argparse
+import phonebook
 
 args = None
 
@@ -87,13 +88,40 @@ def main(records):
 
 
 if __name__ == '__main__':
-    try:
-        with open(serialize.FILENAME, f'r{serialize.file_access_mode}') as f:
-            records = serialize.load(f)
-    except FileNotFoundError:
-        records = {}
-        main(records)
-    except serialize.FileError:
-        print(f'Wrong file format for file {config.filename}!')
-    else:
-        main(records=records)
+    phonebook = phonebook.Phonebook()
+    phonebook.load()
+    while True:
+        operation = input('''
+        Please enter operation code as below:
+          '1 - create user record;
+          '2 - read user record;
+          '3 - update user record;
+          '4 - delete user record;
+          '5 - show all records;
+          '6 - exit;
+        ''')
+        operation_code = operation.strip()
+
+        actions = {
+            '1': phonebook.create_record,
+            # '2': functools.partial(model.read_record, records=records, name=name),
+            # '3': functools.partial(model.update_record, records=records, name=name, phone=phone),
+            # '4': functools.partial(model.delete_record, records=records, name=name),
+            # '5': functools.partial(model.show_all, records=records),
+            # '6': exit,
+        }
+        actions.get(operation_code)()
+
+
+
+
+    # try:
+    #     with open(serialize.FILENAME, f'r{serialize.file_access_mode}') as f:
+    #         records = serialize.load(f)
+    # except FileNotFoundError:
+    #     records = {}
+    #     main(records)
+    # except serialize.FileError:
+    #     print(f'Wrong file format for file {config.filename}!')
+    # else:
+    #     main(records=records)
