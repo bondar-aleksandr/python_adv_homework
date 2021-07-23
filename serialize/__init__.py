@@ -12,11 +12,11 @@ elif config.serializer == 'pickle':
     from .pickle_ import FileError
     from .pickle_ import load
     from .pickle_ import dump
-elif config.serializer == 'csv':
-    FILENAME = f'{config.filename}.csv'
-    file_access_mode = 't'
-    from .csv_ import FileError
-    from .csv_ import load
-    from .csv_ import dump
+#elif config.serializer == 'csv':
+#    FILENAME = f'{config.filename}.csv'
+#    file_access_mode = 't'
+#    from .csv_ import FileError
+#    from .csv_ import load
+#    from .csv_ import dump
 else:
     raise ImportError

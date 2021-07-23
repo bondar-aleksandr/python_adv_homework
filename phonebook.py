@@ -25,24 +25,27 @@ class Phonebook:
         try:
             with open(serialize.FILENAME, f'r{serialize.file_access_mode}') as f:
                 raw_data = serialize.load(f)
+        except serialize.FileError:
+            print(f'Wrong file format for file {serialize.FILENAME}!')
+            raise LoadError(f'Wrong file format for file {serialize.FILENAME}!')
         except FileNotFoundError:
-            raise LoadError(f'Cannot load phonebook from file {serialize.FILENAME}!')
-        else:
-            for name in raw_data:
-                try:
-                    per = person.Person.from_dict(raw_data[name])
-                except KeyError:
-                    raise LoadError(f'Wrong person attributes specified in file {serialize.FILENAME}!')
-                except ValueError:
-                    raise LoadError(f'Wrong chars found in "name" or "phone" attributes!')
-                self.records[per.name] = per
+            raw_data = {}
+
+        for name in raw_data:
+            try:
+                per = person.Person.from_dict(raw_data[name])
+            except KeyError:
+                raise LoadError(f'Wrong person attributes specified in file {serialize.FILENAME}!')
+            except ValueError:
+                raise LoadError(f'Wrong chars found in "name" or "phone" attributes!')
+            self.records[per.name] = per
 
     def save(self):
         raw_data = {}
         for name in self.records:
             raw_data[name] = self.records[name].to_dict()
         try:
-            with open(serialize.FILENAME, f'w{serialize.file_access_mode}', newline='') as f:
+            with open(serialize.FILENAME, f'w{serialize.file_access_mode}') as f:
                 serialize.dump(raw_data, f)
         except Exception:
             raise SaveError(f'Cannot save phonebook to file {serialize.FILENAME}!')
@@ -76,7 +79,7 @@ class Phonebook:
         except KeyError:
             print(f'User {name} doesn\'t exists!')
 
-    def update_record(self, name=None):
+    def update_record(self, name, **kwargs):
         if not name:
             name = input('Enter name to update: ')
         try:
@@ -96,7 +99,7 @@ class Phonebook:
             if attr == 'name':
                 new_name = input('enter new name: ')
                 if not new_name.isalpha():
-                    print('Name must be letters, phone must be digits!')
+                    print('Name must be letters!')
                     return
                 self.create_record(name=new_name, phone=record.phone, email=record.email, address=record.address)
                 del self.records[name]
