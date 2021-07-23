@@ -28,21 +28,19 @@ class Phonebook:
         except FileNotFoundError:
             raise LoadError(f'Cannot load phonebook from file {serialize.FILENAME}!')
         else:
-            for record in raw_data:
-                per = person.Person()
-                for key, value in raw_data[record].items():
-                    for attr in vars(per):
-                        if attr == key:
-                            setattr(per, attr, value)
-                            break
-                if per.name is None:
-                    raise LoadError(f'"name" attribute is missing in file {serialize.FILENAME}!')
+            for name in raw_data:
+                try:
+                    per = person.Person.from_dict(raw_data[name])
+                except KeyError:
+                    raise LoadError(f'Wrong person attributes specified in file {serialize.FILENAME}!')
+                except ValueError:
+                    raise LoadError(f'Wrong chars found in "name" or "phone" attributes!')
                 self.records[per.name] = per
 
     def save(self):
         raw_data = {}
         for name in self.records:
-            raw_data[name] = vars(self.records[name])
+            raw_data[name] = self.records[name].to_dict()
         try:
             with open(serialize.FILENAME, f'w{serialize.file_access_mode}', newline='') as f:
                 serialize.dump(raw_data, f)
@@ -58,14 +56,19 @@ class Phonebook:
             email = input('enter email: ')
         if not address:
             address = input('enter address: ')
-        self.records[name] = person.Person(name=name, phone=phone, email=email, address=address)
+        try:
+            self.records[name] = person.Person(name=name, phone=phone, email=email, address=address)
+        except ValueError:
+            print('Name must be letters, phone must be digits!')
+            return
         print('Success!')
 
     def read_record(self, name=None):
         if not name:
             name = input('Enter name:')
         if not name.isalpha():
-            raise ValueError('Name must be letters!')
+            print('Name must be letters!')
+            return
         try:
             print(config.SEPARATOR)
             print(self.records[name])
@@ -83,27 +86,35 @@ class Phonebook:
             print(f'User {name} doesn\'t exists!')
         else:
             msg = f'There are next field available for update:\n'
-            for attr in vars(record):
+            for attr in record.to_dict():
                 msg += f'{attr}\n'
             print(msg)
             attr = input('Please enter field to update: ')
-            if attr not in vars(record):
+            if attr not in record.to_dict().keys():
                 print('Wrong field entered!')
                 return
-            if attr.lstrip('_') == 'name':
+            if attr == 'name':
                 new_name = input('enter new name: ')
+                if not new_name.isalpha():
+                    print('Name must be letters, phone must be digits!')
+                    return
                 self.create_record(name=new_name, phone=record.phone, email=record.email, address=record.address)
                 del self.records[name]
             else:
                 new_value = input(f'Enter new value for {attr}: ')
-                setattr(record, attr, new_value)
+                try:
+                    setattr(record, attr, new_value)
+                except ValueError:
+                    print('Wrong value provided! Name must be letters, phone must be digits!')
+                    return
                 print('Success!')
 
     def delete_record(self, name=None):
         if not name:
             name = input('Enter name to delete:')
         if not name.isalpha():
-            raise ValueError('Name must be letters!')
+            print('Name must be letters!')
+            return
         try:
             del self.records[name]
             print('Success!')

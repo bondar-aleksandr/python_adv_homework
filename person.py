@@ -16,7 +16,6 @@ class Person:
                 raise ValueError('Name must be letters!')
         self._name = value
 
-
     @property
     def phone(self):
         return self._phone
@@ -27,6 +26,21 @@ class Person:
             if not value.isdigit():
                 raise ValueError('Phone must be digits!')
         self._phone = value
+
+    def to_dict(self):
+        return {
+            'name':self.name,
+            'phone': self.phone,
+            'email': self.email,
+            'address': self.address
+        }
+
+    @classmethod
+    def from_dict(cls, d:dict):
+        allowed_keys = 'name', 'phone', 'email', 'address'
+        if not set(d.keys()) == set(allowed_keys):
+            raise KeyError('Wrong keys!')
+        return cls(**d)
 
     def __repr__(self):
         return f'Person(name={self.name}, phone={self.phone}, email={self.email}, address={self.address})'
