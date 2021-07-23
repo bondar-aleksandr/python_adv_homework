@@ -106,11 +106,12 @@ if __name__ == '__main__':
             '1': phonebook.create_record,
             # '2': functools.partial(model.read_record, records=records, name=name),
             # '3': functools.partial(model.update_record, records=records, name=name, phone=phone),
-            # '4': functools.partial(model.delete_record, records=records, name=name),
+            '4': phonebook.delete_record,
             # '5': functools.partial(model.show_all, records=records),
             # '6': exit,
         }
         actions.get(operation_code)()
+        phonebook.save()
 
 
 

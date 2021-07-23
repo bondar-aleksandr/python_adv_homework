@@ -1,11 +1,13 @@
 class Person:
-    def __init__(self, name, phone, email=None, address=None):
-        if not name.isalpha:
-            raise ValueError('Name must be letters!')
+    def __init__(self, name=None, phone=None, email=None, address=None):
+        if name:
+            if not name.isalpha():
+                raise ValueError('Name must be letters!')
         self.name = name
 
-        if not phone.isdigit:
-            raise ValueError('Phone must be digits!')
+        if phone:
+            if not phone.isdigit():
+                raise ValueError('Phone must be digits!')
         self.phone = phone
 
         self.email = email
