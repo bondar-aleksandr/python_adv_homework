@@ -1,5 +1,6 @@
 import serialize
 import person
+import config
 
 
 class LoadError(Exception):
@@ -32,7 +33,7 @@ class Phonebook:
                 for key, value in raw_data[record].items():
                     for attr in vars(per):
                         if attr == key:
-                            per.__setattr__(attr, value)
+                            setattr(per, attr, value)
                             break
                 if per.name is None:
                     raise LoadError(f'"name" attribute is missing in file {serialize.FILENAME}!')
@@ -48,17 +49,59 @@ class Phonebook:
         except Exception:
             raise SaveError(f'Cannot save phonebook to file {serialize.FILENAME}!')
 
-    def create_record(self, name=None, phone=None):
+    def create_record(self, name=None, phone=None, email=None, address=None):
         if not name:
             name = input('enter name: ')
         if not phone:
             phone = input('enter phone: ')
-        self.records[name] = person.Person(name=name, phone=phone)
+        if not email:
+            email = input('enter email: ')
+        if not address:
+            address = input('enter address: ')
+        self.records[name] = person.Person(name=name, phone=phone, email=email, address=address)
         print('Success!')
+
+    def read_record(self, name=None):
+        if not name:
+            name = input('Enter name:')
+        if not name.isalpha():
+            raise ValueError('Name must be letters!')
+        try:
+            print(config.SEPARATOR)
+            print(self.records[name])
+            print(config.SEPARATOR)
+        except KeyError:
+            print(f'User {name} doesn\'t exists!')
+
+    def update_record(self, name=None):
+        if not name:
+            name = input('Enter name to update: ')
+        try:
+            record = self.records[name]
+            record: person.Person
+        except KeyError:
+            print(f'User {name} doesn\'t exists!')
+        else:
+            msg = f'There are next field available for update:\n'
+            for attr in vars(record):
+                msg += f'{attr}\n'
+            print(msg)
+            attr = input('Please enter field to update: ')
+            if attr not in vars(record):
+                print('Wrong field entered!')
+                return
+            if attr.lstrip('_') == 'name':
+                new_name = input('enter new name: ')
+                self.create_record(name=new_name, phone=record.phone, email=record.email, address=record.address)
+                del self.records[name]
+            else:
+                new_value = input(f'Enter new value for {attr}: ')
+                setattr(record, attr, new_value)
+                print('Success!')
 
     def delete_record(self, name=None):
         if not name:
-            name = input('Enter name:')
+            name = input('Enter name to delete:')
         if not name.isalpha():
             raise ValueError('Name must be letters!')
         try:
@@ -66,3 +109,9 @@ class Phonebook:
             print('Success!')
         except KeyError:
             print(f'User {name} doesn\'t exists!')
+
+    def show_all(self):
+        for record in self.records:
+            print(config.SEPARATOR)
+            print(self.records[record])
+        print(config.SEPARATOR)

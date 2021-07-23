@@ -1,3 +1,3 @@
 serializer = 'json'
 filename = 'phonebook'
-SEPARATOR = '='*10
+SEPARATOR = '='*25
